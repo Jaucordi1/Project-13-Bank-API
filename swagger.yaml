@@ -117,6 +117,7 @@ securityDefinitions:
     in: header
 definitions:
   User:
+    type: object
     properties:
       email:
         type: string
@@ -131,6 +132,7 @@ definitions:
         type: string
         description: user last name
   Login:
+    type: object
     properties:
       email:
         type: string
@@ -155,8 +157,15 @@ definitions:
   LoginResponse:
     type: object
     properties:
-      token:
+      status:
+        type: integer
+      message:
         type: string
+      body:
+        type: object
+        properties:
+          token:
+            type: string
   UserProfile:
     type: object
     properties:
