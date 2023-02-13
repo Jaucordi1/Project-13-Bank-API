@@ -1,0 +1,23 @@
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    place-items: center;
+    place-content: center;
+    margin-bottom: 1rem;
+}
+.wrapper.success {
+    color: mediumseagreen;
+}
+.wrapper.error {
+    color: red;
+}
+
+.title {
+    font-weight: 600;
+    margin: 0;
+}
+
+.message {
+    font-weight: 500;
+    margin: 0;
+}
