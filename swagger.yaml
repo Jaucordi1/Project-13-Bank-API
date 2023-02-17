@@ -2,7 +2,7 @@ swagger: '2.0'
 info:
   title: Bank Argent API documentation
   description: Contains all available API endpoints in this codebase
-  version: '1.1.0'
+  version: '1.0.1'
   termsOfService: 'http://swagger.io/terms/'
 host: localhost:3001
 basePath: /api/v1
@@ -131,14 +131,14 @@ paths:
           description: Invalid Fields
         '500':
           description: Internal Server Error
-  /user/transactions:
+  /transactions:
     post:
       security:
         - Bearer: [ ]
       tags:
-        - User Module
-      summary: User Transactions API
-      description: API for fetching user transaction list
+        - Transaction Module
+      summary: Transactions API
+      description: API for fetching transaction list
       parameters:
         - in: header
           name: Authorization
@@ -149,28 +149,28 @@ paths:
         - application/json
       responses:
         '200':
-          description: User transaction list retrieved successfully
+          description: Transaction list retrieved successfully
           schema:
             allOf:
               - $ref: '#/definitions/ApiResponse'
               - type: object
                 properties:
                   body:
-                    $ref: '#/definitions/UserTransactionList'
+                    $ref: '#/definitions/TransactionList'
         '400':
           description: Invalid Fields
         '404':
           description: Not implemented
         '500':
           description: Internal Server Error
-  /user/transaction:
+  /transaction:
     post:
       security:
         - Bearer: [ ]
       tags:
-        - User Module
-      summary: User Transaction API
-      description: API for fetching user transaction's details
+        - Transaction Module
+      summary: Transaction API
+      description: API for fetching transaction's details
       parameters:
         - in: header
           name: Authorization
@@ -179,18 +179,18 @@ paths:
           required: true
         - in: body
           name: body
-          description: User transaction unique identifier
           required: true
           schema:
             type: object
             properties:
               id:
                 type: string
+                description: Transaction unique identifier
       produces:
         - application/json
       responses:
         '200':
-          description: User transaction details retrieved successfully
+          description: Transaction details retrieved successfully
           schema:
             allOf:
               - $ref: '#/definitions/ApiResponse'
@@ -198,8 +198,8 @@ paths:
                 properties:
                   body:
                     allOf:
-                      - $ref: '#/definitions/UserTransaction'
-                      - $ref: '#/definitions/UserTransactionDetails'
+                      - $ref: '#/definitions/Transaction'
+                      - $ref: '#/definitions/TransactionDetails'
         '400':
           description: Invalid Fields
         '404':
@@ -210,9 +210,9 @@ paths:
       security:
         - Bearer: [ ]
       tags:
-        - User Module
-      summary: User Transaction API
-      description: API for updating a user transaction
+        - Transaction Module
+      summary: Transaction API
+      description: API for updating a transaction
       parameters:
         - in: header
           name: Authorization
@@ -221,15 +221,15 @@ paths:
           required: true
         - in: body
           name: body
-          description: User transaction unique identifier
+          description: Transaction data
           required: true
           schema:
             minProperties: 2
             allOf:
-              - $ref: '#/definitions/UserTransaction'
+              - $ref: '#/definitions/Transaction'
                 required:
                   - id
-              - $ref: '#/definitions/UserTransactionDetails'
+              - $ref: '#/definitions/TransactionDetails'
       produces:
         - application/json
       responses:
@@ -243,8 +243,8 @@ paths:
                   body:
                     type: object
                     allOf:
-                      - $ref: '#/definitions/UserTransaction'
-                      - $ref: '#/definitions/UserTransactionDetails'
+                      - $ref: '#/definitions/Transaction'
+                      - $ref: '#/definitions/TransactionDetails'
         '400':
           description: Invalid Fields
         '404':
@@ -255,9 +255,9 @@ paths:
       security:
         - Bearer: [ ]
       tags:
-        - User Module
-      summary: User Transaction API
-      description: API for deleting a user transaction
+        - Transaction Module
+      summary: Transaction API
+      description: API for deleting a transaction
       parameters:
         - in: header
           name: Authorization
@@ -266,13 +266,14 @@ paths:
           required: true
         - in: body
           name: body
-          description: User transaction unique identifier
+          description: Transaction unique identifier
           required: true
           schema:
             type: object
             properties:
               id:
                 type: string
+                description: Transaction unique identifier
       produces:
         - application/json
       responses:
@@ -284,7 +285,7 @@ paths:
               - type: object
                 properties:
                   body:
-                    $ref: '#/definitions/UserTransaction'
+                    $ref: '#/definitions/Transaction'
         '400':
           description: Invalid Fields
         '404':
@@ -337,34 +338,52 @@ definitions:
           id:
             type: string
             description: user unique identifier
-      - $ref: '#/definitions/Login'
+          email:
+            type: string
+            description: user email address
+          createdAt:
+            type: string
+            description: user creation date
+          updatedAt:
+            type: string
+            description: user last update date
       - $ref: '#/definitions/UserProfile'
-  UserTransaction:
+  Transaction:
     type: object
-    description: Represent a user transaction
+    description: Represent a transaction
     discriminator: id
     properties:
       id:
         type: string
+        description: Transaction unique identifier
       type:
         type: string
+        description: Transaction type
       amount:
         type: number
+        description: Transaction amount
       balance:
         type: number
-  UserTransactionDetails:
+        description: Balance after transaction
+  TransactionDetails:
     type: object
     description: Represent a transaction details
     properties:
-      date:
+      creationDate:
         type: number
-  UserTransactionList:
+        description: Transaction creation date
+      effectiveDate:
+        type: number
+        description: Transaction effective date
+  TransactionList:
     type: object
-    description: Contains a list of UserTransaction and the count of it
+    description: Contains a transaction's list and its count
     properties:
       count:
         type: number
+        description: Number of transactions in list property
       list:
         type: array
+        description: List of Transaction objects
         items:
-          $ref: '#/definitions/UserTransaction'
+          $ref: '#/definitions/Transaction'
