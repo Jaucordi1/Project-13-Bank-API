@@ -28,7 +28,15 @@ paths:
         '200':
           description: Login Successfully
           schema:
-            $ref: '#/definitions/LoginResponse'
+            allOf:
+              - $ref: '#/definitions/ApiResponse'
+              - type: object
+                properties:
+                  body:
+                    type: object
+                    properties:
+                      token:
+                        type: string
         '400':
           description: Invalid Fields
         '500':
@@ -52,7 +60,13 @@ paths:
         '200':
           description: Signup Successfully
           schema:
-            $ref: '#/definitions/ApiResponse'
+            allOf:
+              - $ref: '#/definitions/ApiResponse'
+              - type: object
+                properties:
+                  body:
+                    type: object
+                    $ref: '#/definitions/User'
         '400':
           description: Invalid Fields
         '500':
@@ -60,7 +74,7 @@ paths:
   /user/profile:
     post:
       security:
-        - Bearer: []
+        - Bearer: [ ]
       tags:
         - User Module
       summary: User Profile API
@@ -75,16 +89,21 @@ paths:
         - application/json
       responses:
         '200':
-          description: User profile retrieved successully
+          description: User profile retrieved successfully
           schema:
-            $ref: '#/definitions/ApiResponse'
+            allOf:
+              - $ref: '#/definitions/ApiResponse'
+              - type: object
+                properties:
+                  body:
+                    $ref: '#/definitions/UserProfile'
         '400':
           description: Invalid Fields
         '500':
           description: Internal Server Error
     put:
       security:
-        - Bearer: []
+        - Bearer: [ ]
       tags:
         - User Module
       summary: User Profile API
@@ -105,7 +124,7 @@ paths:
         - application/json
       responses:
         '200':
-          description: User profile retrieved successully
+          description: User profile retrieved successfully
           schema:
             $ref: '#/definitions/ApiResponse'
         '400':
@@ -115,7 +134,7 @@ paths:
   /user/transactions:
     post:
       security:
-        - Bearer: []
+        - Bearer: [ ]
       tags:
         - User Module
       summary: User Transactions API
@@ -130,17 +149,24 @@ paths:
         - application/json
       responses:
         '200':
-          description: User transaction list retrieved successully
+          description: User transaction list retrieved successfully
           schema:
-            $ref: '#/definitions/UserTransactionList'
+            allOf:
+              - $ref: '#/definitions/ApiResponse'
+              - type: object
+                properties:
+                  body:
+                    $ref: '#/definitions/UserTransactionList'
         '400':
           description: Invalid Fields
+        '404':
+          description: Not implemented
         '500':
           description: Internal Server Error
   /user/transaction:
     post:
       security:
-        - Bearer: []
+        - Bearer: [ ]
       tags:
         - User Module
       summary: User Transaction API
@@ -152,21 +178,28 @@ paths:
           type: string
           required: true
         - in: body
-          name: id
+          name: body
           description: User transaction unique identifier
+          required: true
           schema:
             type: object
             properties:
               id:
                 type: string
-          required: true
       produces:
         - application/json
       responses:
         '200':
-          description: User transaction details retrieved successully
+          description: User transaction details retrieved successfully
           schema:
-            $ref: '#/definitions/UserTransactionDetails'
+            allOf:
+              - $ref: '#/definitions/ApiResponse'
+              - type: object
+                properties:
+                  body:
+                    allOf:
+                      - $ref: '#/definitions/UserTransaction'
+                      - $ref: '#/definitions/UserTransactionDetails'
         '400':
           description: Invalid Fields
         '404':
@@ -175,7 +208,7 @@ paths:
           description: Internal Server Error
     put:
       security:
-        - Bearer: []
+        - Bearer: [ ]
       tags:
         - User Module
       summary: User Transaction API
@@ -189,20 +222,73 @@ paths:
         - in: body
           name: body
           description: User transaction unique identifier
+          required: true
           schema:
+            minProperties: 2
             allOf:
               - $ref: '#/definitions/UserTransaction'
+                required:
+                  - id
               - $ref: '#/definitions/UserTransactionDetails'
-          required: true
       produces:
         - application/json
       responses:
         '200':
-          description: User profile retrieved successully
+          description: User transaction updated successfully
           schema:
-            $ref: '#/definitions/ApiResponse'
+            allOf:
+              - $ref: '#/definitions/ApiResponse'
+              - type: object
+                properties:
+                  body:
+                    type: object
+                    allOf:
+                      - $ref: '#/definitions/UserTransaction'
+                      - $ref: '#/definitions/UserTransactionDetails'
         '400':
           description: Invalid Fields
+        '404':
+          description: User transaction not found
+        '500':
+          description: Internal Server Error
+    delete:
+      security:
+        - Bearer: [ ]
+      tags:
+        - User Module
+      summary: User Transaction API
+      description: API for deleting a user transaction
+      parameters:
+        - in: header
+          name: Authorization
+          description: Attach Bearer JWT token
+          type: string
+          required: true
+        - in: body
+          name: body
+          description: User transaction unique identifier
+          required: true
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: User transaction deleted successfully
+          schema:
+            allOf:
+              - $ref: '#/definitions/ApiResponse'
+              - type: object
+                properties:
+                  body:
+                    $ref: '#/definitions/UserTransaction'
+        '400':
+          description: Invalid Fields
+        '404':
+          description: User transaction not found
         '500':
           description: Internal Server Error
 securityDefinitions:
@@ -211,8 +297,19 @@ securityDefinitions:
     name: Authorization
     in: header
 definitions:
-  User:
+  ApiResponse:
     type: object
+    description: Represent a normal call response
+    properties:
+      status:
+        type: integer
+      message:
+        type: string
+      body:
+        type: object
+  Login:
+    type: object
+    description: Represent the data for a user to log in
     properties:
       email:
         type: string
@@ -220,56 +317,32 @@ definitions:
       password:
         type: string
         description: user password
+  UserProfile:
+    type: object
+    description: Represent the user's personal information
+    properties:
       firstName:
         type: string
         description: user first name
       lastName:
         type: string
         description: user last name
-  Login:
+  User:
     type: object
-    properties:
-      email:
-        type: string
-        description: user email
-      password:
-        type: string
-        description: user password
-  ApiResponse:
-    type: object
-    properties:
-      status:
-        type: integer
-      message:
-        type: string
-      body:
-        type: object
+    description: Represent a user
+    discriminator: id
+    allOf:
+      - type: object
         properties:
           id:
             type: string
-          email:
-            type: string
-  LoginResponse:
-    type: object
-    properties:
-      status:
-        type: integer
-      message:
-        type: string
-      body:
-        type: object
-        properties:
-          token:
-            type: string
-  UserProfile:
-    type: object
-    properties:
-      firstName:
-        type: string
-      lastName:
-        type: string
+            description: user unique identifier
+      - $ref: '#/definitions/Login'
+      - $ref: '#/definitions/UserProfile'
   UserTransaction:
     type: object
+    description: Represent a user transaction
+    discriminator: id
     properties:
       id:
         type: string
@@ -281,11 +354,13 @@ definitions:
         type: number
   UserTransactionDetails:
     type: object
+    description: Represent a transaction details
     properties:
       date:
         type: number
   UserTransactionList:
     type: object
+    description: Contains a list of UserTransaction and the count of it
     properties:
       count:
         type: number
