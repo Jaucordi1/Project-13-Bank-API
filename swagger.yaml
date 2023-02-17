@@ -112,6 +112,99 @@ paths:
           description: Invalid Fields
         '500':
           description: Internal Server Error
+  /user/transactions:
+    post:
+      security:
+        - Bearer: []
+      tags:
+        - User Module
+      summary: User Transactions API
+      description: API for fetching user transaction list
+      parameters:
+        - in: header
+          name: Authorization
+          description: Attach Bearer JWT token
+          type: string
+          required: true
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: User transaction list retrieved successully
+          schema:
+            $ref: '#/definitions/UserTransactionList'
+        '400':
+          description: Invalid Fields
+        '500':
+          description: Internal Server Error
+  /user/transaction:
+    post:
+      security:
+        - Bearer: []
+      tags:
+        - User Module
+      summary: User Transaction API
+      description: API for fetching user transaction's details
+      parameters:
+        - in: header
+          name: Authorization
+          description: Attach Bearer JWT token
+          type: string
+          required: true
+        - in: body
+          name: id
+          description: User transaction unique identifier
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+          required: true
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: User transaction details retrieved successully
+          schema:
+            $ref: '#/definitions/UserTransactionDetails'
+        '400':
+          description: Invalid Fields
+        '404':
+          description: User transaction not found
+        '500':
+          description: Internal Server Error
+    put:
+      security:
+        - Bearer: []
+      tags:
+        - User Module
+      summary: User Transaction API
+      description: API for updating a user transaction
+      parameters:
+        - in: header
+          name: Authorization
+          description: Attach Bearer JWT token
+          type: string
+          required: true
+        - in: body
+          name: body
+          description: User transaction unique identifier
+          schema:
+            allOf:
+              - $ref: '#/definitions/UserTransaction'
+              - $ref: '#/definitions/UserTransactionDetails'
+          required: true
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: User profile retrieved successully
+          schema:
+            $ref: '#/definitions/ApiResponse'
+        '400':
+          description: Invalid Fields
+        '500':
+          description: Internal Server Error
 securityDefinitions:
   Bearer:
     type: apiKey
@@ -175,3 +268,28 @@ definitions:
         type: string
       lastName:
         type: string
+  UserTransaction:
+    type: object
+    properties:
+      id:
+        type: string
+      type:
+        type: string
+      amount:
+        type: number
+      balance:
+        type: number
+  UserTransactionDetails:
+    type: object
+    properties:
+      date:
+        type: number
+  UserTransactionList:
+    type: object
+    properties:
+      count:
+        type: number
+      list:
+        type: array
+        items:
+          $ref: '#/definitions/UserTransaction'
