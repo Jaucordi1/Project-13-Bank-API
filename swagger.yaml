@@ -9,6 +9,37 @@ basePath: /api/v1
 schemes:
   - http
 paths:
+  /user/signup:
+    post:
+      tags:
+        - User Module
+      summary: Signup
+      description: API for Signup
+      parameters:
+        - in: body
+          name: body
+          description: Signup Payload
+          required: true
+          schema:
+            $ref: '#/definitions/User'
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Signup Successfully
+          schema:
+            allOf:
+              - $ref: '#/definitions/ApiResponse'
+              - type: object
+                properties:
+                  body:
+                    $ref: '#/definitions/User'
+            example:
+              status: 200
+        '400':
+          description: Invalid Fields
+        '500':
+          description: Internal Server Error
   /user/login:
     post:
       tags:
@@ -37,36 +68,6 @@ paths:
                     properties:
                       token:
                         type: string
-        '400':
-          description: Invalid Fields
-        '500':
-          description: Internal Server Error
-  /user/signup:
-    post:
-      tags:
-        - User Module
-      summary: Signup
-      description: API for Signup
-      parameters:
-        - in: body
-          name: body
-          description: Signup Payload
-          required: true
-          schema:
-            $ref: '#/definitions/User'
-      produces:
-        - application/json
-      responses:
-        '200':
-          description: Signup Successfully
-          schema:
-            allOf:
-              - $ref: '#/definitions/ApiResponse'
-              - type: object
-                properties:
-                  body:
-                    type: object
-                    $ref: '#/definitions/User'
         '400':
           description: Invalid Fields
         '500':
@@ -131,8 +132,40 @@ paths:
           description: Invalid Fields
         '500':
           description: Internal Server Error
+  /accounts:
+    get:
+      security:
+        - Bearer: [ ]
+      tags:
+        - Account Module
+      summary: Accounts API
+      description: API for fetching account list
+      parameters:
+        - in: header
+          name: Authorization
+          description: Attach Bearer JWT token
+          type: string
+          required: true
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Account list retrieved successfully
+          schema:
+            allOf:
+              - $ref: '#/definitions/ApiResponse'
+              - type: object
+                properties:
+                  body:
+                    type: array
+                    items:
+                      $ref: '#/definitions/BankAccount'
+        '400':
+          description: Invalid Fields
+        '500':
+          description: Internal Server Error
   /transactions:
-    post:
+    get:
       security:
         - Bearer: [ ]
       tags:
@@ -156,15 +189,52 @@ paths:
               - type: object
                 properties:
                   body:
-                    $ref: '#/definitions/TransactionList'
+                    type: array
+                    items:
+                      $ref: '#/definitions/UserTransaction'
+        '400':
+          description: Invalid Fields
+        '500':
+          description: Internal Server Error
+    post:
+      security:
+        - Bearer: [ ]
+      tags:
+        - Transaction Module
+      summary: Transactions API
+      description: API for creating a transaction
+      parameters:
+        - in: header
+          name: Authorization
+          description: Attach Bearer JWT token
+          type: string
+          required: true
+        - in: body
+          name: body
+          description: Transaction data
+          required: true
+          schema:
+            $ref: '#/definitions/CreateTransaction'
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: User transaction upserted successfully
+          schema:
+            allOf:
+              - $ref: '#/definitions/ApiResponse'
+              - type: object
+                properties:
+                  body:
+                    $ref: '#/definitions/UserTransaction'
         '400':
           description: Invalid Fields
         '404':
-          description: Not implemented
+          description: User transaction not found
         '500':
           description: Internal Server Error
-  /transaction:
-    post:
+  /transactions/{transactionId}:
+    get:
       security:
         - Bearer: [ ]
       tags:
@@ -177,15 +247,11 @@ paths:
           description: Attach Bearer JWT token
           type: string
           required: true
-        - in: body
-          name: body
+        - in: path
+          name: transactionId
+          description: Transaction unique identifier
+          type: string
           required: true
-          schema:
-            type: object
-            properties:
-              id:
-                type: string
-                description: Transaction unique identifier
       produces:
         - application/json
       responses:
@@ -197,26 +263,29 @@ paths:
               - type: object
                 properties:
                   body:
-                    allOf:
-                      - $ref: '#/definitions/Transaction'
-                      - $ref: '#/definitions/TransactionDetails'
+                    $ref: '#/definitions/UserTransaction'
         '400':
           description: Invalid Fields
         '404':
           description: User transaction not found
         '500':
           description: Internal Server Error
-    put:
+    patch:
       security:
         - Bearer: [ ]
       tags:
         - Transaction Module
       summary: Transaction API
-      description: API for updating a transaction
+      description: API for partially updating a transaction
       parameters:
         - in: header
           name: Authorization
           description: Attach Bearer JWT token
+          type: string
+          required: true
+        - in: path
+          name: transactionId
+          description: Transaction unique identifier
           type: string
           required: true
         - in: body
@@ -224,12 +293,10 @@ paths:
           description: Transaction data
           required: true
           schema:
+            $ref: '#/definitions/UserTransaction'
             minProperties: 2
-            allOf:
-              - $ref: '#/definitions/Transaction'
-                required:
-                  - id
-              - $ref: '#/definitions/TransactionDetails'
+            required:
+              - id
       produces:
         - application/json
       responses:
@@ -241,10 +308,7 @@ paths:
               - type: object
                 properties:
                   body:
-                    type: object
-                    allOf:
-                      - $ref: '#/definitions/Transaction'
-                      - $ref: '#/definitions/TransactionDetails'
+                    $ref: '#/definitions/UserTransaction'
         '400':
           description: Invalid Fields
         '404':
@@ -264,16 +328,11 @@ paths:
           description: Attach Bearer JWT token
           type: string
           required: true
-        - in: body
-          name: body
+        - in: path
+          name: transactionId
           description: Transaction unique identifier
+          type: string
           required: true
-          schema:
-            type: object
-            properties:
-              id:
-                type: string
-                description: Transaction unique identifier
       produces:
         - application/json
       responses:
@@ -285,7 +344,7 @@ paths:
               - type: object
                 properties:
                   body:
-                    $ref: '#/definitions/Transaction'
+                    $ref: '#/definitions/UserTransaction'
         '400':
           description: Invalid Fields
         '404':
@@ -308,6 +367,7 @@ definitions:
         type: string
       body:
         type: object
+
   Login:
     type: object
     description: Represent the data for a user to log in
@@ -348,42 +408,64 @@ definitions:
             type: string
             description: user last update date
       - $ref: '#/definitions/UserProfile'
-  Transaction:
+
+  Amount:
     type: object
-    description: Represent a transaction
+    description: Represent a currency amount
+    properties:
+      currency:
+        type: string
+        description: Represent the amount's currency
+      value:
+        type: number
+        description: Represent the amount's value
+  BankAccount:
+    type: object
+    description: Represent a user account
     discriminator: id
     properties:
       id:
         type: string
-        description: Transaction unique identifier
+        description: User account's unique identifier
       type:
         type: string
-        description: Transaction type
+        description: Account type (account or card)
+      ref:
+        type: string
+        description: User account's reference code
+      name:
+        type: string
+        description: User account's name
       amount:
-        type: number
-        description: Transaction amount
-      balance:
-        type: number
-        description: Balance after transaction
-  TransactionDetails:
+        $ref: '#/definitions/Amount'
+      description:
+        type: string
+        description: User account amount's description
+  CreateTransaction:
     type: object
-    description: Represent a transaction details
     properties:
-      creationDate:
-        type: number
-        description: Transaction creation date
-      effectiveDate:
-        type: number
-        description: Transaction effective date
-  TransactionList:
+      name:
+        type: string
+        description: User transaction's name
+      sender:
+        $ref: '#/definitions/BankAccount'
+      receiver:
+        $ref: '#/definitions/BankAccount'
+      amount:
+        $ref: '#/definitions/Amount'
+  UserTransaction:
     type: object
-    description: Contains a transaction's list and its count
-    properties:
-      count:
-        type: number
-        description: Number of transactions in list property
-      list:
-        type: array
-        description: List of Transaction objects
-        items:
-          $ref: '#/definitions/Transaction'
+    description: Represent a user transaction
+    discriminator: id
+    allOf:
+      - type: object
+        properties:
+          id:
+            type: string
+            description: User transaction's unique identifier
+      - $ref: '#/definitions/CreateTransaction'
+      - type: object
+        properties:
+          date:
+            type: number
+            description: User transaction's timestamp
