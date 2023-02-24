@@ -1,0 +1,10 @@
+.button {
+    --bg-color: #00bc77;
+    --fg-color: #fff;
+
+    border-color: var(--bg-color);
+    background-color: var(--bg-color);
+    color: var(--fg-color);
+    font-weight: bold;
+    padding: 10px;
+}
