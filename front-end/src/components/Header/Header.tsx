@@ -1,45 +1,41 @@
 import Classes from "./Header.module.css"
-import {User, UserProfile} from "../../services/openapi";
+import {useAppDispatch, useAppSelector} from "../../hooks/store";
+import {UPDATE_PROFILE_ACTION} from "../../store/auth/actions";
+import {UserProfile} from "../../services/openapi";
 import {Input} from "../forms/Input/Input";
-import React from "react";
+import React, {useCallback} from "react";
 
-interface HeaderProps {
-    user: User;
-    onProfileUpdate: (updatedProfile: UserProfile) => Promise<any>;
-    loading: boolean;
-    open: boolean;
-    onToggle: (open: boolean) => void;
-}
-
-function Header(props: HeaderProps) {
-    const {user, onProfileUpdate, open, onToggle, loading} = props;
+function Header() {
+    const dispatch = useAppDispatch();
+    const {loading, user} = useAppSelector(state => state.auth);
+    const [editing, setEditing] = React.useState(false);
 
     // State
-    const [edit, setEdit] = React.useState<UserProfile>(user);
-    const isDifferent = edit.firstName !== user.firstName || edit.lastName !== user.lastName;
+    const [edit, setEdit] = React.useState<UserProfile>(user!);
+    const isDifferent = edit.firstName !== user!.firstName || edit.lastName !== user!.lastName;
 
     // State handlers
     const handleChangeFirstName = (firstName: string) => setEdit(old => ({...old, firstName}));
     const handleChangeLastName = (lastName: string) => setEdit(old => ({...old, lastName}));
 
     // Form handlers
-    const handleSubmit = (event: React.FormEvent) => {
+    const handleSubmit = useCallback((event: React.FormEvent) => {
         event.preventDefault();
-        onProfileUpdate(edit).then(() => onToggle(false));
-    }
-    const handleReset = () => {
-        onToggle(false);
-        setEdit(user);
-    };
+        dispatch(UPDATE_PROFILE_ACTION(edit)).then(() => setEditing(false));
+    }, [edit]);
+    const handleReset = useCallback(() => {
+        setEditing(false);
+        setEdit(user!);
+    }, [user]);
 
     return (
         <div className={Classes.header}>
             <h1>
                 Welcome back
                 <br />
-                {!open && [user.firstName, user.lastName].join(' ')!}
+                {!editing && [user!.firstName, user!.lastName].join(' ')}
             </h1>
-            {open && (
+            {editing && (
                 <form action="#" onSubmit={handleSubmit} onReset={handleReset} className={Classes.editForm}>
                     <Input id="firstname" label="First Name" type="text" value={edit.firstName}
                            onChange={handleChangeFirstName} />
@@ -55,7 +51,7 @@ function Header(props: HeaderProps) {
                     </div>
                 </form>
             )}
-            {!open && <button className={Classes.editButton} onClick={() => onToggle(true)}>
+            {!editing && <button className={Classes.editButton} onClick={() => setEditing(true)}>
                 Edit Name
             </button>}
         </div>
