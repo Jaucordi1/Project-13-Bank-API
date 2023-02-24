@@ -17,7 +17,7 @@ function TransactionPage() {
             <Card title={transaction.title}
                   amount={`${transaction.amount.currency}${transaction.amount.value.toLocaleString()}`}
                   amountDescription={editing ? 'Editing…' : 'Saved.'}
-                  button={{text: editing ? 'Annuler' : 'Modifier', onClick: startEditOrSaveChanges}} />
+                  button={{text: editing ? 'Cancel' : 'Edit', onClick: startEditOrSaveChanges}} />
         </div>
     );
 }
