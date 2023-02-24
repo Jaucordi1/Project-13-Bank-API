@@ -3,7 +3,7 @@ import React, {lazy, Suspense} from "react";
 import {Navigation} from "./components/Navigation/Navigation";
 import {Footer} from "./components/Footer/Footer";
 import {useAppDispatch, useAppSelector} from "./hooks/store";
-import {FETCH_PROFILE_ACTION} from "./store/auth/actions";
+import {FETCH_PROFILE_ACTION, SIGNOUT_ACTION} from "./store/auth/actions";
 
 const HomePage = lazy(() => import('./pages/home/HomePage'));
 const SignInPage = lazy(() => import('./pages/sign-in/SignInPage'));
@@ -40,7 +40,10 @@ function AuthProfile({children}: React.PropsWithChildren) {
     const {loading, token, user} = useAppSelector(state => state.auth);
     React.useEffect(() => {
         if (!!token && !user && !loading) {
-            dispatch(FETCH_PROFILE_ACTION(token));
+            dispatch(FETCH_PROFILE_ACTION(token)).catch((error) => {
+                console.debug('Error while reconnecting from saved token :', error);
+                return dispatch(SIGNOUT_ACTION());
+            });
         }
     }, [token, user, loading]);
     return <>{children}</>;
