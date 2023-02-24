@@ -1,5 +1,6 @@
 import Classes from './Card.module.css';
 import classNames from "classnames";
+import {Button} from "../Button/Button";
 
 export type CardProps = {
     title: string;
@@ -25,7 +26,7 @@ export function Card(props: CardProps) {
                 <p className={Classes.amountDescription}>{amountDescription}</p>
             </div>
             {button && <div className={classNames(Classes.content, Classes.cta)}>
-                <button className={Classes.button} onClick={button.onClick}>{button.text}</button>
+                <Button className={Classes.button} onClick={button.onClick}>{button.text}</Button>
             </div>}
         </section>
     );

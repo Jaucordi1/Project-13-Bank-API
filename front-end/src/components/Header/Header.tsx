@@ -4,6 +4,7 @@ import {UPDATE_PROFILE_ACTION} from "../../store/auth/actions";
 import {UserProfile} from "../../services/openapi";
 import {Input} from "../forms/Input/Input";
 import React, {useCallback} from "react";
+import { Button } from "../Button/Button";
 
 function Header() {
     const dispatch = useAppDispatch();
@@ -44,18 +45,18 @@ function Header() {
                                onChange={handleChangeLastName} />
                     </div>
                     <div className={Classes.editFormButtons}>
-                        <button type="reset" disabled={loading} className={Classes.resetButton}>
+                        <Button type="submit" disabled={loading || !isDifferent}>
+                            Save {loading && (<i className="fas fa-circle-notch fa-spin"></i>)}
+                        </Button>
+                        <Button type="reset" disabled={loading} className={Classes.resetButton}>
                             Cancel
-                        </button>
-                        <button type="submit" disabled={loading || !isDifferent} className={Classes.editButton}>
-                            Save changes {loading && (<i className="fas fa-circle-notch fa-spin"></i>)}
-                        </button>
+                        </Button>
                     </div>
                 </form>
             )}
-            {!editing && <button className={Classes.editButton} onClick={() => setEditing(true)}>
+            {!editing && <Button onClick={() => setEditing(true)}>
                 Edit Name
-            </button>}
+            </Button>}
         </div>
     );
 }

@@ -12,11 +12,7 @@
 }
 
 .resetButton {
-    border-color: #bc0000;
-    background-color: #bc0000;
-    color: #fff;
-    font-weight: bold;
-    padding: 10px;
+    --bg-color: #bc0000 !important;
 }
 
 .editForm {
