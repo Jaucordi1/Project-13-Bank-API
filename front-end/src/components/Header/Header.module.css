@@ -26,9 +26,16 @@
     place-content: center;
 }
 
-.editFormButtons {
+.editFormFields {
     display: flex;
     flex-direction: column;
+    place-content: center;
+    place-items: center;
+}
+
+.editFormButtons {
+    display: flex;
+    flex-direction: row;
     place-content: center;
     place-items: center;
     gap: 0.5em;

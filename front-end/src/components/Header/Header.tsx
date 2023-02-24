@@ -37,16 +37,18 @@ function Header() {
             </h1>
             {editing && (
                 <form action="#" onSubmit={handleSubmit} onReset={handleReset} className={Classes.editForm}>
-                    <Input id="firstname" label="First Name" type="text" value={edit.firstName}
-                           onChange={handleChangeFirstName} />
-                    <Input id="lastname" label="Last Name" type="text" value={edit.lastName}
-                           onChange={handleChangeLastName} />
+                    <div className={Classes.editFormFields}>
+                        <Input id="firstname" label="First Name" type="text" value={edit.firstName}
+                               onChange={handleChangeFirstName} />
+                        <Input id="lastname" label="Last Name" type="text" value={edit.lastName}
+                               onChange={handleChangeLastName} />
+                    </div>
                     <div className={Classes.editFormButtons}>
-                        <button type="submit" disabled={loading || !isDifferent} className={Classes.editButton}>
-                            Valider les changements {loading && (<i className="fas fa-circle-notch fa-spin"></i>)}
-                        </button>
                         <button type="reset" disabled={loading} className={Classes.resetButton}>
-                            Annuler
+                            Cancel
+                        </button>
+                        <button type="submit" disabled={loading || !isDifferent} className={Classes.editButton}>
+                            Save changes {loading && (<i className="fas fa-circle-notch fa-spin"></i>)}
                         </button>
                     </div>
                 </form>
