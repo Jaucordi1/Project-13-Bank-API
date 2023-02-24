@@ -1,32 +1,16 @@
-import Classes from "./UserTransaction.module.css"
-import classNames from "classnames"
+import {Card} from "../Card/Card";
+import {useNavigate} from "react-router-dom";
 
-type UserTransactionProps = {
+export type UserTransactionProps = {
     data: any;
 };
 
-function UserTransaction({data}: UserTransactionProps) {
-    return (
-        <section className={Classes.account}>
-            <div className={Classes.accountContentWrapper}>
-                <h3 className={Classes.accountTitle}>
-                    Argent Bank Checking (x8349)
-                </h3>
-                <p className={Classes.accountAmount}>
-                    $2,082.79
-                </p>
-                <p className={Classes.accountAmountDescription}>
-                    Available Balance
-                </p>
-            </div>
-            <div className={classNames(Classes.accountContentWrapper, Classes.cta)}>
-                <button className={Classes.transactionButton}>
-                    View transactions
-                </button>
-            </div>
-        </section>
-    );
-}
+export function UserTransaction(props: UserTransactionProps) {
+    const {data} = props;
+    const navigate = useNavigate();
 
-export type {UserTransactionProps}
-export {UserTransaction}
+    return <Card title={data.title}
+                 amount={`${data.amount.currency}${data.amount.value.toLocaleString()}`}
+                 amountDescription={data.description}
+                 button={{text: 'View details', onClick: () => navigate(`/transaction/${data.id}`)}} />;
+}
