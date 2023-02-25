@@ -1,0 +1,27 @@
+.container {
+    position: relative;
+}
+.container:after {
+    content: '\f078';
+    font-family: FontAwesome;
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    right: 8px;
+    top: 0;
+    bottom: 0;
+    pointer-events: none;
+}
+
+.select {
+    display: inline-block;
+    outline: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    padding: .5rem 2rem .5rem .5rem;
+    background-color: #fff;
+    border: 1px solid black;
+    cursor: pointer;
+}
