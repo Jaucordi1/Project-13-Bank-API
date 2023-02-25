@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "generate-client-api": "openapi --input ../swagger.yaml --output ./src/services/openapi",
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview"
