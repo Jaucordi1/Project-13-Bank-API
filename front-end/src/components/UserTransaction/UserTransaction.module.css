@@ -37,6 +37,7 @@
 .descriptionAmount > * {
     margin: 0;
     display: block;
+    font-weight: bold;
 }
 .notesPreview {
     display: none;
@@ -66,7 +67,6 @@
 }
 .amount {
     text-align: start;
-    font-weight: bold;
     flex-grow: 1;
 }
 .balance {
@@ -88,22 +88,40 @@
 }
 
 .editButton {
+    display: inline-flex;
     background-color: transparent;
     border: none;
     color: black;
+    text-align: start;
 }
 .cancelButton {
     background-color: #bc0000 !important;
     border-color: #bc0000 !important;
 }
 
+.notes {
+    display: inline-flex;
+    flex-direction: row;
+    place-content: flex-start;
+    place-items: flex-start;
+    flex-grow: 1;
+}
+.notes.open {
+    flex-direction: column;
+    place-items: stretch;
+    gap: .5rem;
+}
 .notesForm {
     display: flex;
     flex-direction: column;
     align-items: stretch;
     gap: .5rem;
     box-sizing: border-box;
-    width: 90%;
+    flex-grow: 1;
+}
+.notesTextarea {
+    width: 100%;
+    flex-grow: 1;
 }
 .notesFormActions {
     display: flex;
@@ -159,5 +177,8 @@
         font-size: .8em;
         /*position: absolute;*/
         /*transform: translate(-50%);*/
+    }
+    .content {
+        place-items: stretch;
     }
 }

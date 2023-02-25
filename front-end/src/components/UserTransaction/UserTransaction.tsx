@@ -3,8 +3,8 @@ import {Transaction, TransactionCategory} from "../../services/openapi";
 import {useInPlaceEdit} from "../../hooks/useInPlaceEdit";
 import {Dropdown} from "../forms/Dropdown/Dropdown";
 import {Textarea} from "../forms/Textarea/Textarea";
-import {useNavigate} from "react-router-dom";
 import {Button} from "../Button/Button";
+import classNames from "classnames";
 import React from "react";
 
 export type UserTransactionProps = {
@@ -13,9 +13,6 @@ export type UserTransactionProps = {
 
 export function UserTransaction(props: UserTransactionProps) {
     const {data} = props;
-    const navigate = useNavigate();
-
-    const userAccount = data.amount.value > 0 ? data.receiver : data.sender;
 
     const [editingCategory, category, setCategory, editCategory, closeCategory] = useInPlaceEdit(data.category);
     const [editingNotes, notes, setNotes, editNotes, closeNotes] = useInPlaceEdit(data.notes);
@@ -23,11 +20,14 @@ export function UserTransaction(props: UserTransactionProps) {
     const handleChangeCategory = React.useCallback((newCategory: TransactionCategory) => {
         console.debug(`Switching from '${category}' transaction's category to '${newCategory}'`);
         // TODO UPDATE_TRANSACTION_ACTION from store
+        data.category = newCategory;
+        setCategory(newCategory);
         closeCategory();
     }, [category, closeCategory]);
     const handleChangeNotes = React.useCallback((event: React.FormEvent) => {
         event.preventDefault();
         // TODO UPDATE_TRANSACTION_ACTION from store
+        data.notes = notes;
         closeNotes();
     }, [notes, closeNotes]);
 
@@ -82,7 +82,7 @@ export function UserTransaction(props: UserTransactionProps) {
                         </Dropdown>
                     )}
                 </p>
-                <div>
+                <div className={classNames(Classes.notes, {[Classes.open]: editingNotes})}>
                     <strong>Notes: </strong>
                     {!editingNotes && (
                         <button className={Classes.editButton} onClick={editNotes} title="Edit notes">
@@ -91,7 +91,7 @@ export function UserTransaction(props: UserTransactionProps) {
                     )}
                     {editingNotes && (
                         <form onSubmit={handleChangeNotes} className={Classes.notesForm}>
-                            <Textarea name="notes" id={`transaction-${data.id}-notes`}
+                            <Textarea name="notes" id={`transaction-${data.id}-notes`} className={Classes.notesTextarea}
                                       onChange={event => setNotes(event.target.value)} />
                             <div className={Classes.notesFormActions}>
                                 <Button type="submit">Save</Button>
