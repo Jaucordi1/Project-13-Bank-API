@@ -8,8 +8,8 @@ export function Textarea(props: TextareaProps) {
     const {className, rows = 5, cols = 35, ...others} = props;
 
     return (
-        <label className={Classes.container}>
-            <textarea {...others} rows={rows} cols={cols} className={classNames(Classes.textarea, className)} />
+        <label className={classNames(Classes.container, className)}>
+            <textarea {...others} rows={rows} cols={cols} className={Classes.textarea} />
         </label>
     );
 }
