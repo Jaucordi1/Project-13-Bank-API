@@ -34,7 +34,7 @@ function Header() {
             <h1>
                 Welcome back
                 <br />
-                {!editing && [user!.firstName, user!.lastName].join(' ')}
+                {!editing && [user!.firstName, user!.lastName].join(' ') + '!'}
             </h1>
             {editing && (
                 <form action="#" onSubmit={handleSubmit} onReset={handleReset} className={Classes.editForm}>
