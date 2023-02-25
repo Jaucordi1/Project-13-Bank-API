@@ -1,21 +1,23 @@
-import {UserAccount} from "../../components/UserAccount/UserAccount"
-import {useAppDispatch, useAppSelector} from "../../hooks/store"
-import {UPDATE_PROFILE_ACTION} from "../../store/auth/actions"
-import {Header} from "../../components/Header/Header"
-import {UserProfile} from "../../services/openapi"
-import {useLoaderData} from "react-router-dom"
-import React from "react"
+import Classes from "./ProfilePage.module.css";
+import {UserAccount} from "../../components/UserAccount/UserAccount";
+import {TransactionsList} from "../../services/openapi";
+import {MOCK_USER_ACCOUNTS} from "../../services/mock";
+import {Header} from "../../components/Header/Header";
+import {useLoaderData} from "react-router-dom";
+import React from "react";
 
 function ProfilePage() {
-    const userTransactions = useLoaderData() as any[];
+    const transactions = useLoaderData() as TransactionsList;
 
     return (
         <main className="main bg-dark">
             <Header />
-            <h2 className="sr-only">Accounts</h2>
-            {userTransactions.map(userTransaction => (
-                <UserAccount key={userTransaction.id} data={userTransaction} />
-            ))}
+            <div className={Classes.content}>
+                <h2 className="sr-only">Accounts</h2>
+                {MOCK_USER_ACCOUNTS.map(account => (
+                    <UserAccount key={account.id} data={account} />
+                ))}
+            </div>
         </main>
     );
 }
