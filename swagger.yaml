@@ -132,38 +132,7 @@ paths:
           description: Invalid Fields
         '500':
           description: Internal Server Error
-  /accounts:
-    get:
-      security:
-        - Bearer: [ ]
-      tags:
-        - Account Module
-      summary: Accounts API
-      description: API for fetching account list
-      parameters:
-        - in: header
-          name: Authorization
-          description: Attach Bearer JWT token
-          type: string
-          required: true
-      produces:
-        - application/json
-      responses:
-        '200':
-          description: Account list retrieved successfully
-          schema:
-            allOf:
-              - $ref: '#/definitions/ApiResponse'
-              - type: object
-                properties:
-                  body:
-                    type: array
-                    items:
-                      $ref: '#/definitions/BankAccount'
-        '400':
-          description: Invalid Fields
-        '500':
-          description: Internal Server Error
+
   /transactions:
     get:
       security:
@@ -171,7 +140,7 @@ paths:
       tags:
         - Transaction Module
       summary: Transactions API
-      description: API for fetching transaction list
+      description: API for fetching current month transactions list
       parameters:
         - in: header
           name: Authorization
@@ -189,9 +158,10 @@ paths:
               - type: object
                 properties:
                   body:
-                    type: array
-                    items:
-                      $ref: '#/definitions/UserTransaction'
+                    type: object
+                    properties:
+                      transactions:
+                        $ref: '#/definitions/TransactionsList'
         '400':
           description: Invalid Fields
         '500':
@@ -201,7 +171,7 @@ paths:
         - Bearer: [ ]
       tags:
         - Transaction Module
-      summary: Transactions API
+      summary: Transaction API
       description: API for creating a transaction
       parameters:
         - in: header
@@ -226,11 +196,11 @@ paths:
               - type: object
                 properties:
                   body:
-                    $ref: '#/definitions/UserTransaction'
+                    $ref: '#/definitions/Transaction'
         '400':
           description: Invalid Fields
         '404':
-          description: User transaction not found
+          description: Transaction not found
         '500':
           description: Internal Server Error
   /transactions/{transactionId}:
@@ -263,11 +233,11 @@ paths:
               - type: object
                 properties:
                   body:
-                    $ref: '#/definitions/UserTransaction'
+                    $ref: '#/definitions/Transaction'
         '400':
           description: Invalid Fields
         '404':
-          description: User transaction not found
+          description: Transaction not found
         '500':
           description: Internal Server Error
     patch:
@@ -293,10 +263,7 @@ paths:
           description: Transaction data
           required: true
           schema:
-            $ref: '#/definitions/UserTransaction'
-            minProperties: 2
-            required:
-              - id
+            $ref: '#/definitions/TransactionDetails'
       produces:
         - application/json
       responses:
@@ -308,11 +275,11 @@ paths:
               - type: object
                 properties:
                   body:
-                    $ref: '#/definitions/UserTransaction'
+                    $ref: '#/definitions/Transaction'
         '400':
           description: Invalid Fields
         '404':
-          description: User transaction not found
+          description: Transaction not found
         '500':
           description: Internal Server Error
     delete:
@@ -344,11 +311,11 @@ paths:
               - type: object
                 properties:
                   body:
-                    $ref: '#/definitions/UserTransaction'
+                    $ref: '#/definitions/Transaction'
         '400':
           description: Invalid Fields
         '404':
-          description: User transaction not found
+          description: Transaction not found
         '500':
           description: Internal Server Error
 securityDefinitions:
@@ -367,6 +334,23 @@ definitions:
         type: string
       body:
         type: object
+    required:
+      - status
+      - message
+      - body
+  Amount:
+    type: object
+    description: Represent a currency amount
+    properties:
+      currency:
+        type: string
+        description: Represent the amount's currency
+      value:
+        type: number
+        description: Represent the amount's value
+    required:
+      - currency
+      - value
 
   Login:
     type: object
@@ -378,6 +362,9 @@ definitions:
       password:
         type: string
         description: user password
+    required:
+      - email
+      - password
   UserProfile:
     type: object
     description: Represent the user's personal information
@@ -388,6 +375,9 @@ definitions:
       lastName:
         type: string
         description: user last name
+    required:
+      - firstName
+      - lastName
   User:
     type: object
     description: Represent a user
@@ -408,17 +398,14 @@ definitions:
             type: string
             description: user last update date
       - $ref: '#/definitions/UserProfile'
+    required:
+      - id
+      - email
+      - createdAt
+      - updatedAt
+      - firstName
+      - lastName
 
-  Amount:
-    type: object
-    description: Represent a currency amount
-    properties:
-      currency:
-        type: string
-        description: Represent the amount's currency
-      value:
-        type: number
-        description: Represent the amount's value
   BankAccount:
     type: object
     description: Represent a user account
@@ -429,7 +416,11 @@ definitions:
         description: User account's unique identifier
       type:
         type: string
-        description: Account type (account or card)
+        description: Account type
+        enum:
+          - checking
+          - saving
+          - card
       ref:
         type: string
         description: User account's reference code
@@ -441,31 +432,84 @@ definitions:
       description:
         type: string
         description: User account amount's description
+    required:
+      - id
+      - type
+      - ref
+      - name
+      - amount
+      - description
+
+  TransactionCategory:
+    type: string
+    description: Category of Transaction
+    enum:
+      - Food
+      - Home
+      - Health
+  TransactionType:
+    type: string
+    description: Type of Transaction
+    enum:
+      - Electronic
   CreateTransaction:
     type: object
+    description: Represent data sent when creating a new transaction
     properties:
-      name:
+      description:
         type: string
-        description: User transaction's name
+        description: Transaction label
+      type:
+        $ref: '#/definitions/TransactionType'
       sender:
         $ref: '#/definitions/BankAccount'
       receiver:
         $ref: '#/definitions/BankAccount'
       amount:
         $ref: '#/definitions/Amount'
-  UserTransaction:
+    required:
+      - description
+      - type
+      - sender
+      - receiver
+      - amount
+  TransactionDetails:
     type: object
-    description: Represent a user transaction
+    description: Represent a transaction's user details
+    properties:
+      category:
+        $ref: '#/definitions/TransactionCategory'
+      notes:
+        type: string
+        description: Transaction's user notes
+    minProperties: 1
+  Transaction:
+    type: object
+    description: Represent a persisted transaction in database
     discriminator: id
     allOf:
       - type: object
         properties:
           id:
             type: string
-            description: User transaction's unique identifier
+            description: Unique transaction identifier
+        required:
+          - id
       - $ref: '#/definitions/CreateTransaction'
+      - $ref: '#/definitions/TransactionDetails'
       - type: object
         properties:
+          balance:
+            $ref: '#/definitions/Amount'
           date:
-            type: number
-            description: User transaction's timestamp
+            type: string
+            format: date-time
+            description: Transaction's date
+        required:
+          - balance
+          - date
+  TransactionsList:
+    type: array
+    description: Represent a list of Transaction
+    items:
+      $ref: '#/definitions/Transaction'
