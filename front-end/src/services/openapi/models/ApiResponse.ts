@@ -2,11 +2,11 @@
 /* tslint:disable */
 /* eslint-disable */
 
+/**
+ * Represent a normal call response
+ */
 export type ApiResponse = {
-    status?: number;
-    message?: string;
-    body?: {
-id?: string;
-email?: string;
-};
+    status: number;
+    message: string;
+    body: any;
 };

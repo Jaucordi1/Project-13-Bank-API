@@ -2,7 +2,16 @@
 /* tslint:disable */
 /* eslint-disable */
 
+/**
+ * Represent the user's personal information
+ */
 export type UserProfile = {
-    firstName?: string;
-    lastName?: string;
+    /**
+     * user first name
+     */
+    firstName: string;
+    /**
+     * user last name
+     */
+    lastName: string;
 };
