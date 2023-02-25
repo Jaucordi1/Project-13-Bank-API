@@ -1,9 +1,10 @@
 import {createBrowserRouter, Navigate, Outlet, RouterProvider, useLocation} from "react-router-dom";
-import React, {lazy, Suspense} from "react";
-import {Navigation} from "./components/Navigation/Navigation";
-import {Footer} from "./components/Footer/Footer";
-import {useAppDispatch, useAppSelector} from "./hooks/store";
 import {FETCH_PROFILE_ACTION, SIGNOUT_ACTION} from "./store/auth/actions";
+import {Navigation} from "./components/Navigation/Navigation";
+import {useAppDispatch, useAppSelector} from "./hooks/store";
+import {Footer} from "./components/Footer/Footer";
+import {MOCK_TRANSACTIONS, MOCK_USER_ACCOUNTS} from "./services/mock";
+import React, {lazy, Suspense} from "react";
 
 const HomePage = lazy(() => import('./pages/home/HomePage'));
 const SignInPage = lazy(() => import('./pages/sign-in/SignInPage'));
@@ -78,54 +79,27 @@ const router = createBrowserRouter([
                 path: '/profile',
                 element: <AuthGate requirements="auth-only"><ProfilePage /></AuthGate>,
                 loader: async () => {
-                    // TODO Replace with 'accounts' fetching
-                    return [
-                        {
-                            id: 'account1',
-                            type: 'account',
-                            ref: 'x8349',
-                            title: 'Argent Bank Checking',
-                            description: 'Available Balance',
-                            amount: {
-                                currency: '$',
-                                value: 2_082.79,
-                            },
-                        },
-                        {
-                            id: 'account2',
-                            type: 'account',
-                            ref: 'x6712',
-                            title: 'Argent Bank Savings',
-                            description: 'Available Balance',
-                            amount: {
-                                currency: '$',
-                                value: 10_928.42,
-                            },
-                        },
-                        {
-                            id: 'account3',
-                            type: 'card',
-                            ref: 'x8349',
-                            title: 'Argent Bank Credit Card',
-                            description: 'Current Balance',
-                            amount: {
-                                currency: '$',
-                                value: 184.30,
-                            },
-                        },
-                    ];
+                    // TODO Replace with FETCH_TRANSACTIONS_ACTION store action
+                    //  This action makes use of TransactionModule to fetch a transaction list
+                    return MOCK_TRANSACTIONS;
                 },
             },
             // TODO Phase 2
             {
                 path: '/account/:id',
                 element: <AuthGate requirements="auth-only"><AccountPage /></AuthGate>,
-                loader: async () => {
-                    // TODO Replace with 'transactions' fetching
-                    return [
-                        {id: 'transaction1', title: 'Pile Poil', amount: {currency: '$', value: 1000}},
-                        {id: 'transaction2', title: 'Nouveau PC', amount: {currency: '$', value: 3100}},
-                    ];
+                loader: async (params) => {
+                    const account = MOCK_USER_ACCOUNTS.find(account => account.id === params.params.id);
+                    if (!account) {
+                        throw new Response('Account not found', {status: 404, statusText: 'Not found'});
+                    }
+                    return {
+                        account,
+                        transactions: MOCK_TRANSACTIONS.filter(transaction => {
+                            return transaction.sender.id === account.id
+                                || transaction.receiver.id === account.id
+                        }),
+                    };
                 },
             },
             {
